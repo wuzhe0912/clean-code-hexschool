@@ -1,3 +1,4 @@
+const BASE_URL = 'https://todolist-api.hexschool.io';
 let todoList = [];
 let token = '';
 
@@ -17,113 +18,113 @@ const Toast = Swal.mixin({
     toast.onmouseleave = Swal.resumeTimer;
   },
 });
-function showMessage(status = 'warning', message = '') {
-  Toast.fire({
-    icon: status,
-    title: message,
-  });
-}
 
-function isEmptyField(email, password) {
+const showMessage = (status = 'warning', message = '') => {
+  Toast.fire({ icon: status, title: message });
+};
+
+const isEmptyField = (email, password) => {
   if (!email || !password) {
     showMessage('warning', '用戶名稱和密碼不能為空');
-    return;
+    return true;
   }
-}
+  return false;
+};
 
-async function signUp(userData, nickname) {
-  isEmptyField(userData.email, userData.password);
+const apiRequest = async (method, endpoint, data = null, useToken = false) => {
+  const config = {
+    method,
+    url: `${BASE_URL}${endpoint}`,
+    headers: useToken ? { authorization: token } : {},
+    data,
+  };
 
   try {
-    await axios.post('https://todolist-api.hexschool.io/users/sign_up', {
-      ...userData,
-      nickname,
-    });
+    const response = await axios(config);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || `${method} request failed`;
+  }
+};
+
+const signUp = async (userData, nickname) => {
+  if (isEmptyField(userData.email, userData.password)) return;
+
+  try {
+    await apiRequest('post', '/users/sign_up', { ...userData, nickname });
     showMessage('success', '註冊成功');
   } catch (error) {
-    showMessage('warning', error.response.data.message);
+    showMessage('warning', error);
   }
-}
-// signUp(userData, 'admin');
+};
 
-// 提示：改使用 async await 寫法
-function signIn(userData) {
-  isEmptyField(userData.email, userData.password);
+const signIn = async (userData) => {
+  if (isEmptyField(userData.email, userData.password)) return;
 
-  // 提示：加入 try catch
-  // 提示：使用 SweetAlert2 有效呈現錯誤資訊
-  // 提示：函式一次只做一件事
-  axios
-    .post('https://todolist-api.hexschool.io/users/sign_in', {
-      email: userData.email,
-      password: userData.password,
-    })
-    .then((response) => {
-      token = response.data.token;
-    })
-    .then(() => {
-      axios
-        .get('https://todolist-api.hexschool.io/todos/', {
-          headers: {
-            authorization: token,
-          },
-        })
-        .then((response) => {
-          todoList = response.data.data;
-          renderTodos();
-          showMessage('success', '登入成功');
-        });
-    });
-}
-// signIn(userData);
+  try {
+    const data = await apiRequest('post', '/users/sign_in', userData);
+    token = data.token;
+    await fetchTodoList();
+    showMessage('success', '登入成功');
+  } catch (error) {
+    showMessage('error', error);
+  }
+};
 
-const button = document.getElementById('todo-btn');
-button.addEventListener('click', () => addTodo());
+const fetchTodoList = async () => {
+  try {
+    const data = await apiRequest('get', '/todos/', null, true);
+    todoList = data.data;
+    renderTodoList();
+  } catch (error) {
+    showMessage('error', '新增待辦事項失敗');
+  }
+};
 
-// 提示：改使用 async await 寫法
-function addTodo() {
-  const todoInput = document.getElementById('todo-input').value;
+const addTodoList = async () => {
+  const todoInput = document.getElementById('todo-input');
+  const content = todoInput.value.trim();
 
-  if (!todoInput) return;
+  if (!content) return;
 
-  // 提示：加入 try catch
-  // 提示：使用 SweetAlert2 有效呈現錯誤資訊
-  // 提示：將重複程式碼提取出來
-  axios
-    .post(
-      'https://todolist-api.hexschool.io/todos/',
-      {
-        content: todoInput,
-      },
-      {
-        headers: {
-          authorization: token,
-        },
-      }
-    )
-    .then(() => {
-      axios
-        .get('https://todolist-api.hexschool.io/todos/', {
-          headers: {
-            authorization: token,
-          },
-        })
-        .then((response) => {
-          todoList = response.data.data;
-          renderTodos();
-        });
-    });
-}
+  try {
+    const response = await apiRequest('post', '/todos/', { content }, true);
+    todoList.unshift(response.data);
+    addTodoWithAnimation(content);
+    todoInput.value = '';
+    showMessage('success', '新增待辦事項成功');
+  } catch (error) {
+    showMessage('error', error);
+  }
+};
 
-function renderTodos() {
+const renderTodoList = () => {
   const todoListContainer = document.getElementById('todo-list');
-  let html = '';
+  todoListContainer.innerHTML = '';
 
-  todoList.forEach((todo) => {
-    html += `<li><b>${todo.content}</b></li>`;
+  todoList.forEach((todo, index) => {
+    const li = document.createElement('li');
+    li.className = 'todo-item';
+    li.innerHTML = `<b>${todo.content}</b>`;
+    todoListContainer.appendChild(li);
+
+    setTimeout(() => {
+      li.classList.add('show');
+    }, 50 * index);
   });
+};
 
-  todoListContainer.innerHTML = html;
-}
+const addTodoWithAnimation = (content) => {
+  const todoListContainer = document.getElementById('todo-list');
+  const li = document.createElement('li');
+  li.className = 'todo-item';
+  li.innerHTML = `<b>${content}</b>`;
+  todoListContainer.prepend(li);
+  li.offsetHeight;
+  li.classList.add('show');
+};
 
-// 提示：將重複程式碼提取出來
+document.getElementById('todo-btn').addEventListener('click', addTodoList);
+
+// Initial login
+signIn(userData);
