@@ -104,26 +104,26 @@ const api_path = "http://localhost:3000/api";
 
 // === 3. axios 搭配 Async/Await 與錯誤管理整合 ===
 // 取得商品列表
-const getProductList = async () => {
-  try {
-    const response = await axios.get(`${api_path}/getProductList`);
-    console.log('取得商品列表:', response.data);
-  } catch(error) {
-    console.log('取得商品列表失敗:', error);
-  }
-}
+// const getProductList = async () => {
+//   try {
+//     const response = await axios.get(`${api_path}/getProductList`);
+//     console.log('取得商品列表:', response.data);
+//   } catch(error) {
+//     console.log('取得商品列表失敗:', error);
+//   }
+// }
 
 // 加入購物車
-const addToShoppingCart = async (productId, quantity) => {
-  try {
-    // 第一個參數為商品 ID，第二個參數為商品數量
-    const response = await axios.post(`${api_path}/addToShoppingCart`, {
-      productId,
-      quantity
-    });
-    console.log('加入購物車成功:', response.data);
-  } catch (error) {
-    console.log('加入購物車失敗:', error.response.data.message);
-  }
-}
+// const addToShoppingCart = async (productId, quantity) => {
+//   try {
+//     // 第一個參數為商品 ID，第二個參數為商品數量
+//     const response = await axios.post(`${api_path}/addToShoppingCart`, {
+//       productId,
+//       quantity
+//     });
+//     console.log('加入購物車成功:', response.data);
+//   } catch (error) {
+//     console.log('加入購物車失敗:', error.response.data.message);
+//   }
+// }
 
