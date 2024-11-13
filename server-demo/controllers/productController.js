@@ -7,6 +7,8 @@ exports.getExample = (req, res) => {
 exports.createProduct = (req, res) => {
   const { name, price, description } = req.body;
 
+  let products = [];
+
   // 1. 檢查必填欄位
   if (!name || !price || !description) {
     return res.status(400).json({
@@ -31,7 +33,7 @@ exports.createProduct = (req, res) => {
   
   // 建立新產品
   const newProduct = {
-    id: products.length + 1,
+    id: 1,
     name,
     price,
     description

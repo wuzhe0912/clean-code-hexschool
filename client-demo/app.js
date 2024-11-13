@@ -16,6 +16,8 @@
 //   });
 // }
 
+// getExample();
+
 // Async/Await 寫法
 // function fetchData() {
 //   return new Promise(function(resolve) {
@@ -31,6 +33,7 @@
 //   console.log(data);
 // }
 
+// getExample();
 // 串接本地 API
 const api_path = "http://localhost:3000/api";
 // Promise 寫法
@@ -83,24 +86,24 @@ const api_path = "http://localhost:3000/api";
 
 // === 2. 錯誤與例外處理 ===
 // 隨機數
-// function customPromise() {
-//   return new Promise((resolve, reject) => {
-//     setTimeout(() => {
-//       const randomNumber = Math.floor(Math.random() * 100) + 1;
-//       if (randomNumber % 2 === 0) {
-//         resolve(randomNumber);
-//       } else {
-//         reject(new Error(`奇數: ${randomNumber}`));
-//       }
-//     }, 1000);
-//   });
-// }
+function customPromise() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const randomNumber = Math.floor(Math.random() * 100) + 1;
+      if (randomNumber % 2 === 0) {
+        resolve(randomNumber);
+      } else {
+        reject(new Error(`奇數: ${randomNumber}`));
+      }
+    }, 1000);
+  });
+}
 
-// function count(){
-//   customPromise()
-//   .then(result => console.log(`成功: ${result}`))
-//   .catch(error => console.error(`失敗: ${error.message}`));
-// }
+function count(){
+  customPromise()
+  .then(result => console.log(`成功: ${result}`))
+  .catch(error => console.error(`失敗: ${error.message}`));
+}
 
 // === 3. axios 搭配 Async/Await 與錯誤管理整合 ===
 // 取得商品列表
